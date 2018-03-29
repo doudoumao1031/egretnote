@@ -143,6 +143,7 @@ class Main extends eui.UILayer {
      */
     private static STEP_ROPT:number = 3;
     private static STEP_SCALE:number = .03;
+
     protected startCreateScene(): void {
        
         let stageW = this.stage.stageWidth;
@@ -242,6 +243,23 @@ class Main extends eui.UILayer {
         // button.verticalCenter = 0;
         // this.addChild(button);
         // button.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onButtonClick, this);
+
+        // 1.3 碰撞检测
+        // 核心检测碰撞只有一个API，就是代码中的`hitTestPoint`
+        this._dot = new egret.Shape;
+        this._dot.graphics.beginFill(0x00ff00);
+        this._dot.graphics.drawCircle(0,0,5);
+        this._dot.graphics.endFill();
+
+        this.text.touchEnabled = true; //接上面的类型
+        this.text.addEventListener(egret.TouchEvent.TOUCH_TAP,(evt:egret.TouchEvent) => {
+            evt.stopImmediatePropagation();
+            this._bShapeTest = ! this._bShapeTest;
+            this.updateInfo(TouchCollideStatus.NO_TOUCHED);
+        },this);
+
+        
+
     }
     // 1.1 参数
     private ali:egret.Bitmap;
@@ -281,6 +299,43 @@ class Main extends eui.UILayer {
     //     },this);
     // }
 
+    // 1.3 参数及方法
+    private _dot:egret.Shape;
+    private _iTouchCollideStatus:number;
+    private _bShapeTest:boolean;
+
+    private lauchCollisionTest():void{
+        this._iTouchCollideStatus = TouchCollideStatus.NO_TOUCHED;
+        this._bShapeTest = false;
+        this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchHandler, this);
+        this.updateInfo(TouchCollideStatus.NO_TOUCHED);
+    }
+
+    private checkCollision( stageX:number, stageY:number ):void {
+        // 核心代码
+        var bResult:boolean = this.ali.hitTestPoint(stageX,stageY,this._bShapeTest);
+        this._dot.x=stageX;
+        this._dot.y=stageY;
+        this.updateInfo(bResult?TouchCollideStatus.COLLIDED:TouchCollideStatus.TOUCHED_NO_COLLIDED);
+    }
+
+    private touchHandler(evt:egret.TouchEvent){
+        switch(evt.type){
+            case egret.TouchEvent.TOUCH_MOVE:
+                this.checkCollision(evt.stageX,evt.stageY);
+                break;
+            case egret.TouchEvent.TOUCH_BEGIN:
+                if(!this._text.hitTestPoint(evt.stageX,evt.))
+        }
+    }
+
+    private updateInfo( iStatus:number ){
+        this.text.text = 
+            "碰撞检测结果：" + 
+            ( ["放上手指！","想摸我？", "别摸我！！！"][iStatus] ) +
+            "\n\n碰撞检测模式：" + ( this._bShapeTest ? "非透明像素区域" : "矩形包围盒" ) +
+            "\n（轻触文字区切换）";
+    }
     /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
      * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
