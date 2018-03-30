@@ -153,12 +153,12 @@ var Main = (function (_super) {
         this.addChild(bg);
         // 1 显示对象基本
         // 1.1 最基本的显示
-        this.ali = this.createBitmapByName("ali_png");
-        this.addChild(this.ali);
-        this.ali.x = stageW / 2;
-        this.ali.y = stageH / 2;
-        this.ali.anchorOffsetX = this.ali.width / 2;
-        this.ali.anchorOffsetY = this.ali.height / 2;
+        this._bird = this.createBitmapByName("ali_png");
+        this.addChild(this._bird);
+        this._bird.x = stageW / 2;
+        this._bird.y = stageH / 2;
+        this._bird.anchorOffsetX = this._bird.width / 2;
+        this._bird.anchorOffsetY = this._bird.height / 2;
         // let txInfo = new egret.TextField;// 提示信息
         // this.addChild(txInfo);
         // txInfo.size = 28;
@@ -176,16 +176,16 @@ var Main = (function (_super) {
         // }, this);
         // 1.2 锚点及旋转
         // 阿里复用
-        this.text = new egret.TextField;
-        this.addChild(this.text);
-        this.text.size = 28;
-        this.text.x = 50;
-        this.text.y = 50;
-        this.text.textAlign = egret.HorizontalAlign.LEFT;
-        this.text.textColor = 0x000000;
-        this.text.type = egret.TextFieldType.DYNAMIC;
-        this.text.lineSpacing = 6;
-        this.text.multiline = true;
+        this._txInfo = new egret.TextField;
+        this.addChild(this._txInfo);
+        this._txInfo.size = 28;
+        this._txInfo.x = 50;
+        this._txInfo.y = 50;
+        this._txInfo.textAlign = egret.HorizontalAlign.LEFT;
+        this._txInfo.textColor = 0x000000;
+        this._txInfo.type = egret.TextFieldType.DYNAMIC;
+        this._txInfo.lineSpacing = 6;
+        this._txInfo.multiline = true;
         // this.launchAnimations(); //1.2交互方法
         // let line = new egret.Shape();
         // line.graphics.lineStyle(2, 0xffffff);
@@ -223,41 +223,25 @@ var Main = (function (_super) {
         // button.verticalCenter = 0;
         // this.addChild(button);
         // button.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onButtonClick, this);
+        // 1.3 碰撞检测
+        // 核心检测碰撞只有一个API，就是代码中的`hitTestPoint`
+        // this._dot = new egret.Shape;
+        // this._dot.graphics.beginFill(0x00ff00);
+        // this._dot.graphics.drawCircle(0,0,5);
+        // this._dot.graphics.endFill();
+        // this._txInfo.touchEnabled = true; //接上面的类型
+        // this._txInfo.addEventListener(egret.TouchEvent.TOUCH_TAP,(evt:egret.TouchEvent) => {
+        //     evt.stopImmediatePropagation();
+        //     this._bShapeTest = ! this._bShapeTest;
+        //     this.updateInfo(TouchCollideStatus.NO_TOUCHED); // 该方法封装了文字逻辑
+        // },this);
+        // this.launchCollisionTest();
+        // 1.4 遮罩
+        var func = Demo1_4.imgLoadHandler.bind(this);
+        func();
+        // Demo1_4.imgLoadHandler(this);
+        // Demo1_4.launch(this);
     };
-    // 1.2 参数 以及 交互方法
-    // private STEP_ROT:number =3;
-    // private STEP_SCALE:number = .03;
-    // private AniMode:number;
-    // private ScaleBase:number;
-    // private AniModes = {
-    //     ANIM_ROT: 0, 
-    //     ANIM_SCALE: 1,
-    // };
-    // private launchAnimations():void{
-    //     this.AniMode = this.AniModes.ANIM_ROT;// 这儿这么引似乎有问题
-    //     // this.AniMode = 0;
-    //     this.stage.addEventListener(egret.TouchEvent.TOUCH_TAP,() => {
-    //         this.AniMode = (this.AniMode + 1)%3;
-    //     },this);
-    //     this.ScaleBase = 0;
-    //     this.addEventListener(egret.Event.ENTER_FRAME,(evt:egret.Event)=>{//进入新一帧的广播事件
-    //         switch(this.AniMode){
-    //             case this.AniModes.ANIM_ROT: //旋转
-    //             // case 0:
-    //                 this.ali.rotation += this.STEP_ROT;
-    //                 break;
-    //             case this.AniModes.ANIM_SCALE: //缩放
-    //             // case 1:
-    //                 this.ali.scaleX=this.ali.scaleY=0.5+0.5*Math.abs(Math.sin(this.ScaleBase+=this.STEP_SCALE));
-    //                 break;
-    //         }
-    //         this.text.text = 
-    //             "旋转角度：" + this.ali.rotation +
-    //             "\n缩放比例：" + this.ali.scaleX.toFixed(2) +
-    //             "\n轻触进入" + ["缩放","静止","旋转"][this.AniMode] + "模式";
-    //         return false;  /// 友情提示： startTick 中回调返回值表示执行结束是否立即重绘 ???
-    //     },this);
-    // }
     /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
      * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
@@ -315,4 +299,14 @@ var Main = (function (_super) {
     return Main;
 }(eui.UILayer));
 __reflect(Main.prototype, "Main");
+// 1.3
+var TouchCollideStatus = (function () {
+    function TouchCollideStatus() {
+    }
+    TouchCollideStatus.NO_TOUCHED = 0;
+    TouchCollideStatus.TOUCHED_NO_COLLIDED = 1;
+    TouchCollideStatus.COLLIDED = 2;
+    return TouchCollideStatus;
+}());
+__reflect(TouchCollideStatus.prototype, "TouchCollideStatus");
 //# sourceMappingURL=Main.js.map

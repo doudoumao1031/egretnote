@@ -159,12 +159,12 @@ class Main extends eui.UILayer {
         // 1.1 最基本的显示
         
 
-        this.ali = this.createBitmapByName("ali_png");
-        this.addChild(this.ali);
-        this.ali.x = stageW/2;
-        this.ali.y = stageH/2;
-        this.ali.anchorOffsetX = this.ali.width/2;
-        this.ali.anchorOffsetY = this.ali.height/2;
+        this._bird = this.createBitmapByName("ali_png");
+        this.addChild(this._bird);
+        this._bird.x = stageW/2;
+        this._bird.y = stageH/2;
+        this._bird.anchorOffsetX = this._bird.width/2;
+        this._bird.anchorOffsetY = this._bird.height/2;
         
         // let txInfo = new egret.TextField;// 提示信息
         // this.addChild(txInfo);
@@ -187,16 +187,16 @@ class Main extends eui.UILayer {
 
         // 阿里复用
 
-        this.text = new egret.TextField;
-        this.addChild(this.text);
-        this.text.size = 28;
-        this.text.x = 50;
-        this.text.y = 50;
-        this.text.textAlign = egret.HorizontalAlign.LEFT;
-        this.text.textColor = 0x000000;
-        this.text.type = egret.TextFieldType.DYNAMIC;
-        this.text.lineSpacing = 6;
-        this.text.multiline = true;
+        this._txInfo = new egret.TextField;
+        this.addChild(this._txInfo);
+        this._txInfo.size = 28;
+        this._txInfo.x = 50;
+        this._txInfo.y = 50;
+        this._txInfo.textAlign = egret.HorizontalAlign.LEFT;
+        this._txInfo.textColor = 0x000000;
+        this._txInfo.type = egret.TextFieldType.DYNAMIC;
+        this._txInfo.lineSpacing = 6;
+        this._txInfo.multiline = true;
 
         // this.launchAnimations(); //1.2交互方法
         
@@ -246,24 +246,35 @@ class Main extends eui.UILayer {
 
         // 1.3 碰撞检测
         // 核心检测碰撞只有一个API，就是代码中的`hitTestPoint`
-        this._dot = new egret.Shape;
-        this._dot.graphics.beginFill(0x00ff00);
-        this._dot.graphics.drawCircle(0,0,5);
-        this._dot.graphics.endFill();
+        // this._dot = new egret.Shape;
+        // this._dot.graphics.beginFill(0x00ff00);
+        // this._dot.graphics.drawCircle(0,0,5);
+        // this._dot.graphics.endFill();
 
-        this.text.touchEnabled = true; //接上面的类型
-        this.text.addEventListener(egret.TouchEvent.TOUCH_TAP,(evt:egret.TouchEvent) => {
-            evt.stopImmediatePropagation();
-            this._bShapeTest = ! this._bShapeTest;
-            this.updateInfo(TouchCollideStatus.NO_TOUCHED);
-        },this);
+        // this._txInfo.touchEnabled = true; //接上面的类型
+        // this._txInfo.addEventListener(egret.TouchEvent.TOUCH_TAP,(evt:egret.TouchEvent) => {
+        //     evt.stopImmediatePropagation();
+        //     this._bShapeTest = ! this._bShapeTest;
+        //     this.updateInfo(TouchCollideStatus.NO_TOUCHED); // 该方法封装了文字逻辑
+        // },this);
 
-        
+        // this.launchCollisionTest();
+
+        // 1.4 遮罩
+        let func = Demo1_4.imgLoadHandler.bind(this); func();
+        // Demo1_4.imgLoadHandler(this);
+        // Demo1_4.launch(this);
 
     }
+    // private onAddToStage(event:egret.Event) {
+    //     var imgLoader:egret.ImageLoader = new egret.ImageLoader;
+    //     imgLoader.once( egret.Event.COMPLETE, this.imgLoadHandler, this );
+    //     imgLoader.load( "resource/cartoon-egret_03.png" );
+    // }
     // 1.1 参数
-    private ali:egret.Bitmap;
-    private text:egret.TextField;
+    private _bird:egret.Bitmap;
+    private _txInfo:egret.TextField;
+
     // 1.2 参数 以及 交互方法
     // private STEP_ROT:number =3;
     // private STEP_SCALE:number = .03;
@@ -300,42 +311,63 @@ class Main extends eui.UILayer {
     // }
 
     // 1.3 参数及方法
-    private _dot:egret.Shape;
-    private _iTouchCollideStatus:number;
-    private _bShapeTest:boolean;
 
-    private lauchCollisionTest():void{
-        this._iTouchCollideStatus = TouchCollideStatus.NO_TOUCHED;
-        this._bShapeTest = false;
-        this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchHandler, this);
-        this.updateInfo(TouchCollideStatus.NO_TOUCHED);
-    }
+    // private _dot:egret.Shape;
+    // private _iTouchCollideStatus:number; // 图像区域的碰撞状态
+    // private _bShapeTest:boolean; // 文字区域的碰撞状态
 
-    private checkCollision( stageX:number, stageY:number ):void {
-        // 核心代码
-        var bResult:boolean = this.ali.hitTestPoint(stageX,stageY,this._bShapeTest);
-        this._dot.x=stageX;
-        this._dot.y=stageY;
-        this.updateInfo(bResult?TouchCollideStatus.COLLIDED:TouchCollideStatus.TOUCHED_NO_COLLIDED);
-    }
+    // private launchCollisionTest():void{ // 启动碰撞测试
+    //     this._iTouchCollideStatus = TouchCollideStatus.NO_TOUCHED; //初始状态
+    //     this._bShapeTest = false;//初始状态
+    //     this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchHandler, this);
+    //     this.updateInfo(TouchCollideStatus.NO_TOUCHED);
+    // }
 
-    private touchHandler(evt:egret.TouchEvent){
-        switch(evt.type){
-            case egret.TouchEvent.TOUCH_MOVE:
-                this.checkCollision(evt.stageX,evt.stageY);
-                break;
-            case egret.TouchEvent.TOUCH_BEGIN:
-                if(!this._text.hitTestPoint(evt.stageX,evt.))
-        }
-    }
+    // private checkCollision( stageX:number, stageY:number ):void {
+    //     // 核心代码
+    //     var bResult:boolean = this._bird.hitTestPoint(stageX,stageY,this._bShapeTest); //最后一个参数是干嘛的
+    //     this._dot.x=stageX;
+    //     this._dot.y=stageY;
+    //     this.updateInfo(bResult?TouchCollideStatus.COLLIDED:TouchCollideStatus.TOUCHED_NO_COLLIDED);
+    // }
 
-    private updateInfo( iStatus:number ){
-        this.text.text = 
-            "碰撞检测结果：" + 
-            ( ["放上手指！","想摸我？", "别摸我！！！"][iStatus] ) +
-            "\n\n碰撞检测模式：" + ( this._bShapeTest ? "非透明像素区域" : "矩形包围盒" ) +
-            "\n（轻触文字区切换）";
-    }
+    // private touchHandler(evt:egret.TouchEvent){ // 这儿本身是为了性能问题 解决监听器的挂载/释放问题 处理逻辑放在封装方法
+    //     switch(evt.type){
+    //         case egret.TouchEvent.TOUCH_MOVE:
+    //             this.checkCollision(evt.stageX,evt.stageY);
+    //             break;
+    //         case egret.TouchEvent.TOUCH_BEGIN:
+    //             if(!this._txInfo.hitTestPoint(evt.stageX,evt.stageY)){ // 如果触摸不在文字区域
+    //                 this.stage.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.touchHandler, this);
+    //                 this.stage.once(egret.TouchEvent.TOUCH_END, this.touchHandler, this);
+    //                 this.addChild(this._dot);
+    //                 this.checkCollision( evt.stageX, evt.stageY );
+    //             }
+    //             break;
+    //         case egret.TouchEvent.TOUCH_END:
+    //             this.stage.removeEventListener(egret.TouchEvent.TOUCH_MOVE, this.touchHandler, this);
+    //             this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.touchHandler, this);
+    //             if(this._dot.parent){// 这儿是判定如果点挂上去了
+    //                 this._dot.parent.removeChild(this._dot);
+    //             }
+    //             this.updateInfo(TouchCollideStatus.NO_TOUCHED);
+    //             break;
+    //     }
+    // }
+
+    // private updateInfo( iStatus:number ){
+    //     this.text.text = 
+    //         "碰撞检测结果：" + 
+    //         ( ["放上手指！","想摸我？", "别摸我！！！"][iStatus] ) +
+    //         "\n\n碰撞检测模式：" + ( this._bShapeTest ? "非透明像素区域" : "矩形包围盒" ) +
+    //         "\n（轻触文字区切换）";
+    // }
+
+    // 1.4
+
+    private _shpBeMask:egret.Shape;
+
+
     /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
      * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
@@ -388,3 +420,11 @@ class Main extends eui.UILayer {
         this.addChild(panel);
     }
 }
+
+// 1.3
+class TouchCollideStatus{ // 封装碰撞状态
+    public static NO_TOUCHED:number = 0;
+    public static TOUCHED_NO_COLLIDED:number = 1;
+    public static COLLIDED:number = 2;
+}
+
